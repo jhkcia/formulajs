@@ -1,6 +1,6 @@
 {
   "author": "Formulajs",
-  "name": "@formulajs/formulajs",
+  "name": "@startinfinity/formulajs",
   "description": "JavaScript implementation of most Microsoft Excel formula functions",
   "version": "2.9.2",
   "repository": {
