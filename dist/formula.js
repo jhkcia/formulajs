@@ -267,20 +267,46 @@ exports.parseMatrix = function(matrix) {
   return matrix;
 };
 
-var d1900 = new Date(Date.UTC(1900, 0, 1));
-exports.parseDate = function(date) {
+function serialNumberToDate(serial) {
+  if (serial < 60) {
+    serial += 1;
+  }
+  var utc_days = Math.floor(serial - 25569);
+  var utc_value = utc_days * 86400;
+  var date_info = new Date(utc_value * 1000);
+
+  var fractional_day = serial - Math.floor(serial) + 0.0000001;
+
+  var total_seconds = Math.floor(86400 * fractional_day);
+
+  var seconds = total_seconds % 60;
+
+  total_seconds -= seconds;
+
+  var hours = Math.floor(total_seconds / (60 * 60));
+  var minutes = Math.floor(total_seconds / 60) % 60;
+  var days = date_info.getDate();
+  var month = date_info.getMonth();
+
+  if (serial >= 60 && serial < 61) {
+    var days = 29;
+    var month = 1;
+    console.log('Here');
+  }
+
+  return new Date(date_info.getFullYear(), month, days, hours, minutes, seconds);
+}
+
+exports.parseDate = function (date) {
   if (!isNaN(date)) {
     if (date instanceof Date) {
       return new Date(date);
     }
-    var d = parseInt(date, 10);
-    if (d < 0) {
+    var d = parseFloat(date);
+    if (d < 0 || d >= 2958466) {
       return error.num;
     }
-    if (d <= 60) {
-      return new Date(d1900.getTime() + (d - 1) * 86400000);
-    }
-    return new Date(d1900.getTime() + (d - 2) * 86400000);
+    return serialNumberToDate(d);
   }
   if (typeof date === 'string') {
     date = new Date(date);
@@ -3977,17 +4003,22 @@ exports.SUBSTITUTE = function(text, old_text, new_text, occurrence) {
   if (!text || !old_text) {
     return text;
   } else if (occurrence === undefined) {
-    return text.replace(new RegExp(old_text, 'g'), new_text);
+    return text.split(old_text).join(new_text);
   } else {
+    occurrence = Math.floor(Number(occurrence));
+    if (Number.isNaN(occurrence) || occurrence <= 0) {
+      return error.value;
+    }
     var index = 0;
     var i = 0;
-    while (text.indexOf(old_text, index) > 0) {
+    while (index > -1 && text.indexOf(old_text, index) > -1) {
       index = text.indexOf(old_text, index + 1);
       i++;
-      if (i === occurrence) {
+      if (index > -1 && i === occurrence) {
         return text.substring(0, index) + new_text + text.substring(index + old_text.length);
       }
     }
+    return text;
   }
 };
 
@@ -4472,11 +4503,11 @@ exports.DATE = function (year, month, day) {
   if (utils.anyIsError(year, month, day)) {
     result = error.value;
 
-  } else if (year < 0 || month < 0 || day < 0) {
-    result = error.num;
-
   } else {
     result = new Date(year, month - 1, day);
+    if (result.getFullYear() < 0) {
+      result = error.num;
+    }
   }
 
   return result;
