@@ -23,7 +23,13 @@ describe('Date & Time', function () {
     dateTime.DATE(10, 1, 1).getFullYear().should.equal(1910);
     dateTime.DATE(-1, 1, 1).should.equal(error.num);
     // dateTime.DATE(1899, 1, 1).getFullYear().should.equal(3799);
-    dateTime.DATE('invalid').should.equal(error.value);
+    dateTime.DATE(2000, 1, 'invalid').should.equal(error.value);
+
+    dateTime.DATE().should.equal(error.na);
+    dateTime.DATE(2000).should.equal(error.na);
+    dateTime.DATE(2000, 1).should.equal(error.na);
+    dateTime.DATE(2000, 1, 1, 1).should.equal(error.na);
+
   });
 
   it('DATEDIF', function () {
