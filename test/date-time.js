@@ -9,7 +9,13 @@ describe('Date & Time', function () {
     it('should thrown an error in case of malformed input', function () {
       dateTime.DATE(10, 1, 1).getFullYear().should.equal(1910);
       dateTime.DATE(-1, 1, 1).should.equal(error.num);
-      dateTime.DATE('invalid').should.equal(error.value);
+      dateTime.DATE('invalid').should.equal(error.na);
+      dateTime.DATE(2000, 1, 'invalid').should.equal(error.value);
+      dateTime.DATE().should.equal(error.na);
+      dateTime.DATE(2000).should.equal(error.na);
+      dateTime.DATE(2000, 1).should.equal(error.na);
+      dateTime.DATE(2000, 1, 1, 1).should.equal(error.na);
+  
     });
 
     it('should create date', function () {
@@ -36,7 +42,7 @@ describe('Date & Time', function () {
     xit('should be Excel behaviour, but we do not want to recreate it', function () {
       dateTime.DATE(1899, 1, 1).getFullYear().should.equal(3799);
     });
-  })
+  });
 
   it('DATEDIF', function () {
     dateTime.DATEDIF('1/1/2001', '1/1/2003', 'Y').should.equal(2);
@@ -180,6 +186,7 @@ describe('Date & Time', function () {
 
   it('NOW', function () {
     dateTime.NOW().should.instanceof(Date);
+    dateTime.NOW('').should.equal(error.na);
   });
 
   it('SECOND', function () {
@@ -192,7 +199,8 @@ describe('Date & Time', function () {
     dateTime.TIME(0, 0, 0).should.equal(0);
     dateTime.TIME(1, 1, 1).should.approximately(0.04237268518518519, 1e-9);
     dateTime.TIME(-1, -1, -1).should.equal(error.num);
-    dateTime.TIME('invalid').should.equal(error.value);
+    dateTime.TIME(1, 1, 'invalid').should.equal(error.value);
+    dateTime.TIME('invalid').should.equal(error.na);
   });
 
   it('TIMEVALUE', function () {
@@ -206,6 +214,8 @@ describe('Date & Time', function () {
     dateTime.TODAY().getHours().should.equal(0);
     dateTime.TODAY().getMinutes().should.equal(0);
     dateTime.TODAY().getSeconds().should.equal(0);
+    dateTime.TODAY('').should.equal(error.na);
+
   });
 
   it('WEEKDAY', function () {
